@@ -3,6 +3,7 @@ import https from 'https';
 const port = 10001;
 
 http.createServer(function (req, res) {
+  console.log("req is: ", req);
   res.writeHead(200, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({
     data: 'Hello World!',
