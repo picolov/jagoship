@@ -3,14 +3,27 @@ import https from 'https';
 const port = 10001;
 
 http.createServer(function (req, res) {
-  console.log("req is: ", req);
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({
-    data: 'Hello World!',
-  }));
+  console.log("request: ", req.method, req.url, req.headers);
+  let body = '';
+  req.on('data', (chunk) => {
+    body += chunk;
+  });
+  req.on('end', () => {
+    console.log("body: ", body);
+    const jsonBody = JSON.parse(body);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    if (req.url === "/message") {
+      sendSlackMessage({ text: `replying message back to <@${jsonBody.user}>` });
+      res.end(JSON.stringify({
+        status: 'success',
+      }));
+    } else {
+      res.end("{}");
+    }
+  });
 }).listen(port, () => {
   console.log(`Example app listening on port ${port}`);
-  sendSlackMessage({text: `Jagoship ONLINE on: ${new Date().toISOString()}`});
+  sendSlackMessage({ text: `Jagoship ONLINE on: ${new Date().toISOString()}` });
 });
 
 const sendSlackMessage = (message) => {
